@@ -1,0 +1,56 @@
+{
+   "Electronics and Technology":
+   {
+      "Televisions": ["https://www.amazon.com/s?k=Televisions&crid=1MW79ESMS55ZO&sprefix=televisions%2Caps%2C221&ref=nb_sb_noss_1", 15],
+      "Laptops and Computers": ["https://www.amazon.com/s?k=laptops+and+computers&crid=2JV3UM83DFBR1&sprefix=laptops+and+computers%2Caps%2C151&ref=nb_sb_noss_1", 10],
+      "Smartphones": ["https://www.amazon.com/s?k=smartphones&crid=13BJPKZQ0SC73&sprefix=smartphones%2Caps%2C144&ref=nb_sb_noss_1", 10],
+      "Cameras": ["https://www.amazon.com/s?k=cameras&crid=H3LOYM1J3PX5&sprefix=cameras%2Caps%2C164&ref=nb_sb_noss_1", 15],
+      "Gaming Consoles": ["https://www.amazon.com/s?k=gaming+consoles&crid=3555L5MLUXXSP&sprefix=gaming+consoles%2Caps%2C159&ref=nb_sb_noss_1",10]
+   },
+
+   "Fashion and Apparel":
+   {
+      "Clothing": ["https://www.amazon.com/s?k=clothing&crid=271WVZIKQZ46G&sprefix=clothing%2Caps%2C159&ref=nb_sb_noss_2", 30],
+      "Shoes": ["https://www.amazon.com/s?k=shoes&crid=30WNCGC83BF6G&sprefix=shoes%2Caps%2C193&ref=nb_sb_noss_1", 30],
+      "Accessories": ["https://www.amazon.com/s?k=Accessories&crid=24K1L10KYL5&sprefix=accessories%2Caps%2C197&ref=nb_sb_noss_1", 30],
+      "Jewelry": ["https://www.amazon.com/s?k=Jewelry&crid=2XOL35OMJAQGX&sprefix=jewelry%2Caps%2C201&ref=nb_sb_noss_1", 20],
+      "Watches": ["https://www.amazon.com/s?k=Watches&crid=1U53SUFXKNJVZ&sprefix=watches%2Caps%2C204&ref=nb_sb_noss_1", 20]
+   },
+
+   "Home and Kitchen":
+   {
+      "Furniture": ["https://www.amazon.com/s?k=Furniture&crid=LHB7CQ0ES1PL&sprefix=furniture%2Caps%2C274&ref=nb_sb_noss_1", 20],
+      "Appliances": ["https://www.amazon.com/s?k=Appliances&crid=2SDVJ6VUR2TSL&sprefix=appliances%2Caps%2C176&ref=nb_sb_noss_1", 10],
+      "Cookware and Kitchenware": ["https://www.amazon.com/s?k=Cookware+and+Kitchenware&crid=3KA022A1FW98N&sprefix=cookware+and+kitchenware%2Caps%2C256&ref=nb_sb_noss_2", 30],
+      "Home Decor": ["https://www.amazon.com/s?k=Home+Decor&crid=1V45ME8BGRHFJ&sprefix=home+decor%2Caps%2C207&ref=nb_sb_noss_1", 30],
+      "Bedding and Bath": ["https://www.amazon.com/s?k=Bedding+and+Bath&crid=2X3XKWDFZGOVT&sprefix=bedding+and+bath%2Caps%2C213&ref=nb_sb_noss_1",30]
+   },
+
+   "Beauty and Personal Care":
+   {
+      "Skincare": ["https://www.amazon.com/s?k=Skincare&crid=2ZNOF65WBP30&sprefix=skincare%2Caps%2C216&ref=nb_sb_noss_2", 20],
+      "Makeup": ["https://www.amazon.com/s?k=Makeup&crid=N5OE7O5CP171&sprefix=makeup%2Caps%2C170&ref=nb_sb_noss_1", 20],
+      "Haircare": ["https://www.amazon.com/s?k=Haircare&crid=ZSRD6GSWOHPI&sprefix=haircare%2Caps%2C228&ref=nb_sb_noss_2", 20],
+      "Fragrances": ["https://www.amazon.com/s?k=Fragrances&crid=UBEC4695YCM&sprefix=fragrances%2Caps%2C205&ref=nb_sb_noss_1", 15],
+      "Personal Care Appliances": ["https://www.amazon.com/s?k=Personal+Care+Appliances&crid=WC0AZNNOTLW7&sprefix=personal+care+appliances%2Caps%2C256&ref=nb_sb_noss_1", 10]
+   },
+
+   "Sports and Fitness":
+   {
+      "Exercise Equipment": ["https://www.amazon.com/s?k=Exercise+Equipment&crid=5ZBGTHVDSSG7&sprefix=exercise+equipment%2Caps%2C185&ref=nb_sb_noss_1", 10],
+      "Sports Apparel": ["https://www.amazon.com/s?k=Sports+Apparel&crid=1515ZA5NZNHLB&sprefix=sports+apparel%2Caps%2C200&ref=nb_sb_noss_1", 30],
+      "Athletic Shoes": ["https://www.amazon.com/s?k=Athletic+Shoes&crid=XW7V782LPCJY&sprefix=athletic+shoes%2Caps%2C219&ref=nb_sb_noss_1", 30],
+      "Outdoor Gear": ["https://www.amazon.com/s?k=Outdoor+Gear&crid=FKCVBVWBPHHN&sprefix=outdoor+gear%2Caps%2C207&ref=nb_sb_noss_1", 30],
+      "Fitness Trackers": ["https://www.amazon.com/s?k=Fitness+Trackers&crid=WLHHQMB0EAPR&sprefix=fitness+trackers%2Caps%2C331&ref=nb_sb_noss_1",10]
+   },
+
+   "Books, Music, and Media":
+   {
+      "Books": ["https://www.amazon.com/b?node=283155", 30],
+      "Music": ["https://www.amazon.com/s?k=Music&i=stripbooks-intl-ship&crid=1B6G30VFP5Q1P&sprefix=music%2Cstripbooks-intl-ship%2C190&ref=nb_sb_noss_1", 10],
+      "Movies and TV Shows": ["https://www.amazon.com/s?k=Movies+and+TV+Shows&i=stripbooks-intl-ship&crid=3BG2WPVKFLLV0&sprefix=movies+and+tv+shows%2Cstripbooks-intl-ship%2C196&ref=nb_sb_noss_2", 10],
+      "Video Games": ["https://www.amazon.com/s?k=Video+Games&i=stripbooks-intl-ship&crid=1QB5NHGUL6X37&sprefix=video+games%2Cstripbooks-intl-ship%2C185&ref=nb_sb_noss_1", 10],
+      "E-books and Audiobooks": ["https://www.amazon.com/s?k=E-books+and+Audiobooks&i=stripbooks-intl-ship&crid=LY4TTRS686AV&sprefix=e-books+and+audiobooks%2Cstripbooks-intl-ship%2C188&ref=nb_sb_noss", 10]
+   }
+
+}
