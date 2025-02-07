@@ -18,7 +18,8 @@ import {
     IconButton,
     Tooltip,
     FormControlLabel,
-    Switch
+    Switch,
+    Link
 } from '@mui/material';
 import { 
     DeleteIcon,
@@ -195,8 +196,7 @@ export default function EnhancedTable() {
 
     React.useEffect(() => {
         console.log(filterDate)
-        axios.get(`http://localhost:8000/api/normattiva?filterDate=${filterDate}` )
-        // axios.get('http://188.245.216.211:8000/api/normattiva')
+        axios.get(`http://188.245.216.211:8000/api/normattiva?filterDate=${filterDate}`)
         .then((res) => {
             console.log(res.data)
             if(res.data.status === "success")
@@ -351,7 +351,7 @@ export default function EnhancedTable() {
                                             </TableCell>
                                             <TableCell align="right">{row.status ? "Yes" : "No"}</TableCell>
                                             <TableCell align="right">{row.fileName}</TableCell>
-                                            <TableCell align="right">{row.fileLink}</TableCell>
+                                            <TableCell align="right"><Link href={`/pdf/${row.fileName.split('.')[0]}`} target="_blank" rel="noopener noreferrer">{row.fileLink} </Link></TableCell>
                                         </TableRow>
                                     );
                                 })}

@@ -1,12 +1,21 @@
 import logo from './logo.svg';
 import './App.css';
-import BasicTable from './table';
+import {
+  Routes,
+  Route,
+  Navigate
+} from 'react-router-dom';
 
+import EnhancedTable from './newtable';
+import PdfPage from './pdfpage'
 
 
 function App() {
   return (
-    <BasicTable />
+    <Routes>
+      <Route path="/" element={<EnhancedTable/>} />
+      <Route path="/pdf/:filename" element={<PdfPage/>}/>
+    </Routes>
   );
 }
 
