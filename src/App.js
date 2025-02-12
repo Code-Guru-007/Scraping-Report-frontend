@@ -6,15 +6,15 @@ import {
   Navigate
 } from 'react-router-dom';
 
-import EnhancedTable from './newtable';
+import HomePage from './homepage';
 import PdfPage from './pdfpage'
 
 
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<EnhancedTable/>} />
-      <Route path="/pdf/:filename" element={<PdfPage/>}/>
+      <Route path="/" element={<HomePage/>} />
+      <Route path="/pdf/:filename" element={<PdfPage />}/>
     </Routes>
   );
 }
