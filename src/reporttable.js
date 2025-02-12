@@ -21,26 +21,121 @@ import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { visuallyHidden } from '@mui/utils';
 
-import axios from 'axios';
+
+function descendingComparator(a, b, orderBy) {
+    if (b[orderBy] < a[orderBy]) {
+        return -1;
+    }
+    if (b[orderBy] > a[orderBy]) {
+        return 1;
+    }
+    return 0;
+}
+
+function getComparator(order, orderBy) {
+    return order === 'desc'
+        ? (a, b) => descendingComparator(a, b, orderBy)
+        : (a, b) => -descendingComparator(a, b, orderBy);
+}
+
+const headCells = [
+    {
+        id: 'id',
+        numeric: true,
+        disablePadding: false,
+        label: 'No',
+        sortable: false
+    },
+    {
+        id: 'dateTime',
+        numeric: true,
+        disablePadding: false,
+        label: 'Date and  Time',
+        sortable: true
+    },
+    {
+        id: 'status',
+        numeric: true,
+        disablePadding: false,
+        label: 'Scrape Status',
+        sortable: true
+    },
+    {
+        id: 'fileName',
+        numeric: true,
+        disablePadding: false,
+        label: 'File Name',
+        sortable: true
+    },
+    {
+        id: 'fileLink',
+        numeric: true,
+        disablePadding: false,
+        label: 'Action',
+        sortable: false
+    },
+];
+
+
+function EnhancedTableHead(props) {
+    const { order, orderBy, onRequestSort } =
+        props;
+    const createSortHandler = (property) => (event) => {
+        onRequestSort(event, property);
+    };
+
+    return (
+        <TableHead>
+            <TableRow>
+                {headCells.map((headCell) => (
+                    <TableCell
+                        key={headCell.id}
+                        align={headCell.numeric ? 'right' : 'left'}
+                        padding={headCell.disablePadding ? 'none' : 'normal'}
+                        sortDirection={orderBy === headCell.id ? order : false}
+                    >
+                        {headCell.sortable ? (<TableSortLabel
+                            active={orderBy === headCell.id}
+                            direction={orderBy === headCell.id ? order : 'asc'}
+                            onClick={createSortHandler(headCell.id)}
+                        >
+                            {headCell.label}
+                            {orderBy === headCell.id ? (
+                                <Box component="span" sx={visuallyHidden}>
+                                    {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                                </Box>
+                            ) : null}
+                        </TableSortLabel>) : (<>{headCell.label}</>)}
+                        
+                    </TableCell>
+                ))}
+            </TableRow>
+        </TableHead>
+    );
+}
+
+EnhancedTableHead.propTypes = {
+    numSelected: PropTypes.number.isRequired,
+    onRequestSort: PropTypes.func.isRequired,
+    onSelectAllClick: PropTypes.func.isRequired,
+    order: PropTypes.oneOf(['asc', 'desc']).isRequired,
+    orderBy: PropTypes.string.isRequired,
+    rowCount: PropTypes.number.isRequired,
+};
 
 export default function ReportTable(props) {
-    const { rows, category, setFilterDate } = props;
+    const { rows, page, category, setFilterDate, setPage} = props;
     const [order, setOrder] = useState('asc');
     const [orderBy, setOrderBy] = useState('dateTime');
 
     // Load page number from localStorage
-    const [page, setPage] = useState(() => {
-        return parseInt(localStorage.getItem("pageNumber")) || 0;
-    });
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const navigate = useNavigate();
 
 
-    useEffect(() => {
-        setPage(0);
-        localStorage.setItem("pageNumber", 0);
-    }, [category]);
+
 
     const viewPdf = (row) => {
         navigate(`/pdf/${row.fileName.split('.')[0]}`, { 
@@ -53,6 +148,12 @@ export default function ReportTable(props) {
     useEffect(() => {
         localStorage.setItem("pageNumber", page); // Store page number
     }, [page]);
+
+    const handleRequestSort = (event, property) => {
+        const isAsc = orderBy === property && order === 'asc';
+        setOrder(isAsc ? 'desc' : 'asc');
+        setOrderBy(property);
+    };
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
@@ -70,9 +171,9 @@ export default function ReportTable(props) {
     const visibleRows = useMemo(
         () =>
             [...rows]
-                .sort((a, b) => (order === 'asc' ? (a.dateTime > b.dateTime ? 1 : -1) : (a.dateTime < b.dateTime ? 1 : -1)))
+                .sort(getComparator(order, orderBy))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
-        [rows, order, orderBy, page, rowsPerPage]
+        [rows, order, orderBy, page, rowsPerPage],
     );
 
     return (
@@ -100,15 +201,12 @@ export default function ReportTable(props) {
             </Toolbar>
             <TableContainer>
                 <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size="medium">
-                    <TableHead>
-                        <TableRow>
-                            <TableCell align="right">No</TableCell>
-                            <TableCell align="right">Date and Time</TableCell>
-                            <TableCell align="right">Scrape Status</TableCell>
-                            <TableCell align="right">File Name</TableCell>
-                            <TableCell align="right">Action</TableCell>
-                        </TableRow>
-                    </TableHead>
+                    <EnhancedTableHead
+                        order={order}
+                        orderBy={orderBy}
+                        onRequestSort={handleRequestSort}
+                        rowCount={rows.length}
+                    />
                     <TableBody>
                         {visibleRows.map((row, index) => (
                             <TableRow hover role="checkbox" tabIndex={-1} key={index} sx={{ cursor: 'pointer' }}>

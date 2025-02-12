@@ -16,8 +16,20 @@ export default function HomePage() {
     });
     const [filterDate, setFilterDate] = useState(null);
     const [rows, setRows] = useState([]);
+    const [page, setPage] = useState(() => {
+        return parseInt(localStorage.getItem("pageNumber")) || 0;
+    });
 
-    const category = useMemo(() => categoryList[selectedMenu], [selectedMenu, categoryList]);
+    const category = useMemo(() => {
+        const last_category = localStorage.getItem("categoryType") || "normattiva"
+        if(categoryList[selectedMenu].type !== last_category) {
+            setPage(0);
+            localStorage.setItem("pageNumber", 0);
+        }
+        localStorage.setItem("categoryType", categoryList[selectedMenu].type);
+        return categoryList[selectedMenu]
+    }, [selectedMenu, categoryList]);
+
 
     useEffect(() => {
         localStorage.setItem("selectedMenu", selectedMenu); // Save selection
@@ -67,7 +79,13 @@ export default function HomePage() {
                     </Paper>
                 </Grid>
                 <Grid item xs={10}>
-                    <ReportTable rows={rows} setFilterDate={setFilterDate} category={category} />
+                    <ReportTable 
+                        rows={rows} 
+                        page={page}
+                        category={category} 
+                        setPage={setPage}
+                        setFilterDate={setFilterDate} 
+                    />
                 </Grid>
             </Grid>
         </>
