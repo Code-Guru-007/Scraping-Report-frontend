@@ -4,10 +4,10 @@ import axios from 'axios';
 import ReportTable from './reporttable';
 
 export default function HomePage() {
-    const menuItems = useMemo(() => ["Normattiva", "Normattiva Local"], []);
+    const menuItems = useMemo(() => ["Normativa Nazionale", "Sentenze cassazione"], []);
     const categoryList = useMemo(() => [
-        { title: "www.normattiva.it", type: "normattiva" },
-        { title: "www.agenziaentrate.gov.it", type: "normattiva_local" }
+        { title: "www.normattiva.it/ricerca/elencoPerData", type: "normattiva" },
+        { title: "www.italgiure.giustizia.it/sncass/", type: "sentenze_cassazione" }
     ], []);
 
     // Retrieve selected menu and page number from localStorage

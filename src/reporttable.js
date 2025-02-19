@@ -127,7 +127,7 @@ EnhancedTableHead.propTypes = {
 
 export default function ReportTable(props) {
     const { rows, page, category, setFilterDate, setPage} = props;
-    const [order, setOrder] = useState('asc');
+    const [order, setOrder] = useState('desc');
     const [orderBy, setOrderBy] = useState('dateTime');
 
     // Load page number from localStorage
@@ -140,7 +140,7 @@ export default function ReportTable(props) {
     const viewPdf = (row) => {
         navigate(`/pdf/${row.fileName.split('.')[0]}`, { 
             state: { 
-                fileLink: row.fileLink,
+                fileLink: `http://188.245.216.211/public/download/${category.type}/${row.fileLink}`,
             } 
         });
     };
@@ -210,12 +210,12 @@ export default function ReportTable(props) {
                     <TableBody>
                         {visibleRows.map((row, index) => (
                             <TableRow hover role="checkbox" tabIndex={-1} key={index} sx={{ cursor: 'pointer' }}>
-                                <TableCell align="right">{page * rowsPerPage + index + 1}</TableCell>
+                                <TableCell align="right">{rows.length - page * rowsPerPage - index}</TableCell>
                                 <TableCell align="right">{new Date(row.dateTime).toLocaleString()}</TableCell>
                                 <TableCell align="right">{row.status ? "Yes" : "No"}</TableCell>
                                 <TableCell align="right">{row.fileName}</TableCell>
                                 <TableCell align="right">
-                                    <Tooltip title={row.fileLink}>
+                                    <Tooltip title={`DB-Legale-doc/${category.type}/downloaded/${row.fileLink}`}>
                                         <Button variant="outlined" onClick={() => viewPdf(row)}>
                                             View PDF
                                         </Button>
@@ -232,7 +232,7 @@ export default function ReportTable(props) {
                 </Table>
             </TableContainer>
             <TablePagination
-                rowsPerPageOptions={[5, 10, 25]}
+                rowsPerPageOptions={[5, 10, 25, 100, 500, 1000]}
                 component="div"
                 count={rows.length}
                 rowsPerPage={rowsPerPage}

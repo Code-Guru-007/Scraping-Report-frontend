@@ -1,14 +1,15 @@
-import React, { useEffect, useState }  from "react";
-import { useParams, useLocation, useNavigate } from "react-router-dom";
+import React  from "react";
+import {  useLocation, useNavigate } from "react-router-dom";
 import IconButton from '@mui/material/IconButton';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 
 
 function PdfPage(props) {
 
-    const { filename } = useParams()
+    // const { filename } = useParams()
     const location = useLocation()
     const { fileLink } = location.state
+    console.log(fileLink)
     const navigate = useNavigate()
 
     const googleViewerUrl = `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(fileLink)}`;
