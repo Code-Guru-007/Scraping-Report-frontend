@@ -7,14 +7,14 @@ import {
 } from 'react-router-dom';
 
 import HomePage from './homepage';
-import PdfPage from './pdfpage'
+// import PdfPage from './pdfpage'
 
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<HomePage/>} />
-      <Route path="/pdf/:filename" element={<PdfPage />}/>
+      {/* <Route path="/pdf/:filename" element={<PdfPage />}/> */}
     </Routes>
   );
 }

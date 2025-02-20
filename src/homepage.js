@@ -4,9 +4,9 @@ import axios from 'axios';
 import ReportTable from './reporttable';
 
 export default function HomePage() {
-    const menuItems = useMemo(() => ["Normativa Nazionale", "Sentenze cassazione"], []);
+    const menuItems = useMemo(() => ["Normativa Nazionale", "Sentenze Cassazione"], []);
     const categoryList = useMemo(() => [
-        { title: "www.normattiva.it/ricerca/elencoPerData", type: "normattiva" },
+        { title: "www.normattiva.it/ricerca/elencoPerData", type: "normative" },
         { title: "www.italgiure.giustizia.it/sncass/", type: "sentenze_cassazione" }
     ], []);
 
@@ -19,6 +19,8 @@ export default function HomePage() {
     const [page, setPage] = useState(() => {
         return parseInt(localStorage.getItem("pageNumber")) || 0;
     });
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [total, setTotal] = useState(0);
 
     const category = useMemo(() => {
         const last_category = localStorage.getItem("categoryType") || "normattiva"
@@ -38,16 +40,21 @@ export default function HomePage() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const res = await axios.get(`http://188.245.216.211:8000/api/${category.type}?filterDate=${filterDate}`);
+                const res = await axios.get(`http://188.245.216.211:8000/api/${category.type}?filterDate=${filterDate}&page=${page}&rowsPerPage=${rowsPerPage}`);
+                // const res = await axios.get(`http://localhost:8000/api/${category.type}?filterDate=${filterDate}&page=${page}&rowsPerPage=${rowsPerPage}`);
                 if (res.data.status === "success") {
                     setRows(res.data.reports);
+                    setTotal(res.data.total)
                 }
+                else setRows([])
             } catch (error) {
                 console.error("Error fetching data:", error);
+                setRows([])
+                setTotal(0)
             }
         };
         fetchData();
-    }, [filterDate, category]);
+    }, [filterDate, category, page, rowsPerPage]);
 
     const handleMenuSelect = useCallback((index) => {
         setSelectedMenu(index);
@@ -80,9 +87,12 @@ export default function HomePage() {
                 </Grid>
                 <Grid item xs={10}>
                     <ReportTable 
+                        total={total}
                         rows={rows} 
                         page={page}
                         category={category} 
+                        rowsPerPage={rowsPerPage}
+                        setRowsPerPage={setRowsPerPage}
                         setPage={setPage}
                         setFilterDate={setFilterDate} 
                     />
