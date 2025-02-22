@@ -9,7 +9,6 @@ function PdfPage(props) {
     // const { filename } = useParams()
     const location = useLocation()
     const { fileLink } = location.state
-    console.log(fileLink)
     const navigate = useNavigate()
 
     const googleViewerUrl = `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(fileLink)}`;

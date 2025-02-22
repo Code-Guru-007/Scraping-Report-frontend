@@ -1,13 +1,21 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Container, Typography, Paper, Grid, MenuItem, MenuList } from '@mui/material';
+import { 
+    Container, 
+    Typography, 
+    Paper, 
+    Grid, 
+    MenuItem, 
+    MenuList, 
+} from '@mui/material';
 import axios from 'axios';
 import ReportTable from './reporttable';
 
 export default function HomePage() {
-    const menuItems = useMemo(() => ["Normativa Nazionale", "Sentenze Cassazione"], []);
+    const menuItems = useMemo(() => ["Normativa Nazionale", "Sentenze Cassazione", "def.finanze.it"], []);
     const categoryList = useMemo(() => [
-        { title: "www.normattiva.it/ricerca/elencoPerData", type: "normative" },
-        { title: "www.italgiure.giustizia.it/sncass/", type: "sentenze_cassazione" }
+        { title: "www.normattiva.it/ricerca/elencoPerData", type: "normative", ftpPath: "DB-Legale-doc/normative/downloaded"},
+        { title: "www.italgiure.giustizia.it/sncass/", type: "sentenze_cassazione", ftpPath: "DB-Legale-doc/sentenze_cassazione/downloaded"},
+        { title: "def.finanze.it/DocTribFrontend/RS2_HomePage.jsp", type: "def.finanze.it", ftpPath: "DB-Legale-doc/fisco/downloaded/def.finanze.it"}
     ], []);
 
     // Retrieve selected menu and page number from localStorage
@@ -21,6 +29,7 @@ export default function HomePage() {
     });
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [total, setTotal] = useState(0);
+    const [loading, setLoading] = useState(false);
 
     const category = useMemo(() => {
         const last_category = localStorage.getItem("categoryType") || "normattiva"
@@ -39,19 +48,23 @@ export default function HomePage() {
 
     useEffect(() => {
         const fetchData = async () => {
+            setLoading(true); // Start loading
             try {
                 const res = await axios.get(`http://188.245.216.211:8000/api/${category.type}?filterDate=${filterDate}&page=${page}&rowsPerPage=${rowsPerPage}`);
                 // const res = await axios.get(`http://localhost:8000/api/${category.type}?filterDate=${filterDate}&page=${page}&rowsPerPage=${rowsPerPage}`);
                 if (res.data.status === "success") {
                     setRows(res.data.reports);
-                    setTotal(res.data.total)
+                    setTotal(res.data.total);
+                } else {
+                    setRows([]);
+                    setTotal(0);
                 }
-                else setRows([])
             } catch (error) {
                 console.error("Error fetching data:", error);
-                setRows([])
-                setTotal(0)
+                setRows([]);
+                setTotal(0);
             }
+            setLoading(false); // Stop loading
         };
         fetchData();
     }, [filterDate, category, page, rowsPerPage]);
@@ -77,7 +90,8 @@ export default function HomePage() {
                                 <MenuItem 
                                     key={index} 
                                     selected={selectedMenu === index} 
-                                    onClick={() => handleMenuSelect(index)}
+                                    onClick={() => !loading && handleMenuSelect(index)} 
+                                    disabled={loading}
                                 >
                                     {item}
                                 </MenuItem>
@@ -88,6 +102,7 @@ export default function HomePage() {
                 <Grid item xs={10}>
                     <ReportTable 
                         total={total}
+                        loading={loading}
                         rows={rows} 
                         page={page}
                         category={category} 

@@ -11,7 +11,8 @@ import {
     Typography,
     Paper,
     Button,
-    Tooltip
+    Tooltip,
+    CircularProgress
 } from '@mui/material';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -103,12 +104,14 @@ function EnhancedTableHead(props) {
 // };
 
 export default function ReportTable(props) {
-    const { rows, page, category, setFilterDate, setPage, rowsPerPage, setRowsPerPage, total} = props;
+    const { rows, page, loading, category, setFilterDate, setPage, rowsPerPage, setRowsPerPage, total} = props;
 
     // Load page number from localStorage
     
 
     const viewPdf = (row) => {
+        // const filePath = `${category.type}/downloaded/${row.fileLink}`
+        // const fileLink = `http://localhost:8000/api/getpdf?filePath=${encodeURIComponent(filePath)}&fileName=${encodeURIComponent(row.fileName)}`;
         const fileLink = `http://188.245.216.211/public/download/${category.type}/${row.fileLink}`;
         const googleViewerUrl = `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(fileLink)}`;
         window.open(googleViewerUrl, '_blank'); // Opens in a new tab
@@ -162,34 +165,32 @@ export default function ReportTable(props) {
             </Toolbar>
             <TableContainer>
                 <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size="medium">
-                    <EnhancedTableHead
-                        // order={order}
-                        // orderBy={orderBy}
-                        // onRequestSort={handleRequestSort}
-                        // rowCount={rows.length}
-                    />
-                    <TableBody>
-                        {rows.map((row, index) => (
-                            <TableRow hover role="checkbox" tabIndex={-1} key={index} sx={{ cursor: 'pointer' }}>
-                                <TableCell align="right">{total - page * rowsPerPage - index}</TableCell>
-                                <TableCell align="right">{new Date(row.dateTime).toLocaleString()}</TableCell>
-                                <TableCell align="right">{row.status ? "Yes" : "No"}</TableCell>
-                                <TableCell align="right">{row.fileName}</TableCell>
-                                <TableCell align="right">
-                                    <Tooltip title={`DB-Legale-doc/${category.type}/downloaded/${row.fileLink}`}>
-                                        <Button variant="outlined" onClick={() => viewPdf(row)}>
-                                            View PDF
-                                        </Button>
-                                    </Tooltip>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                        {/* {emptyRows > 0 && (
-                            <TableRow style={{ height: 53 * emptyRows }}>
-                                <TableCell colSpan={6} />
-                            </TableRow>
-                        )} */}
-                    </TableBody>
+                    <EnhancedTableHead/>
+                        <TableBody>
+                            {loading ? (
+                                <TableRow>
+                                    <TableCell colSpan={headCells.length} align="center">
+                                        <CircularProgress />
+                                    </TableCell>
+                                </TableRow>
+                                ):(
+                                rows.map((row, index) => (
+                                    <TableRow hover role="checkbox" tabIndex={-1} key={index} sx={{ cursor: 'pointer' }}>
+                                        <TableCell align="right">{total - page * rowsPerPage - index}</TableCell>
+                                        <TableCell align="right">{new Date(row.dateTime).toLocaleString()}</TableCell>
+                                        <TableCell align="right">{row.status ? "Yes" : "No"}</TableCell>
+                                        <TableCell align="right">{row.fileName}</TableCell>
+                                        <TableCell align="right">
+                                            <Tooltip title={`${category.ftpPath}/${row.fileLink}`}>
+                                                <Button variant="outlined" onClick={() => viewPdf(row)}  disabled={!row.status}>
+                                                    View PDF
+                                                </Button>
+                                            </Tooltip>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                                )}
+                        </TableBody>
                 </Table>
             </TableContainer>
             <TablePagination
@@ -200,6 +201,7 @@ export default function ReportTable(props) {
                 page={page}
                 onPageChange={handleChangePage}
                 onRowsPerPageChange={handleChangeRowsPerPage}
+                disabled={loading}
             />
         </Paper>
     );
