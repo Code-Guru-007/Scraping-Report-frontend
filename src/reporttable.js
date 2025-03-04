@@ -55,11 +55,6 @@ const headCells = [
 
 
 function EnhancedTableHead(props) {
-    // const { order, orderBy, onRequestSort } =
-    //     props;
-    // const createSortHandler = (property) => (event) => {
-    //     onRequestSort(event, property);
-    // };
 
     return (
         <TableHead>
@@ -69,23 +64,8 @@ function EnhancedTableHead(props) {
                         key={headCell.id}
                         align={headCell.numeric ? 'right' : 'left'}
                         padding={headCell.disablePadding ? 'none' : 'normal'}
-                        // sortDirection={orderBy === headCell.id ? order : false}
                     >
-                        {/* {headCell.sortable ? (<TableSortLabel
-                            active={orderBy === headCell.id}
-                            direction={orderBy === headCell.id ? order : 'asc'}
-                            onClick={createSortHandler(headCell.id)}
-                        >
-                            {headCell.label}
-                            {orderBy === headCell.id ? (
-                                <Box component="span" sx={visuallyHidden}>
-                                    {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                                </Box>
-                            ) : null}
-                        </TableSortLabel>) : 
-                        (<> */}
                         {headCell.label}
-                        {/* </>)} */}
                         
                     </TableCell>
                 ))}
@@ -94,14 +74,6 @@ function EnhancedTableHead(props) {
     );
 }
 
-// EnhancedTableHead.propTypes = {
-//     numSelected: PropTypes.number.isRequired,
-//     onRequestSort: PropTypes.func.isRequired,
-//     onSelectAllClick: PropTypes.func.isRequired,
-//     order: PropTypes.oneOf(['asc', 'desc']).isRequired,
-//     orderBy: PropTypes.string.isRequired,
-//     // rowCount: PropTypes.number.isRequired,
-// };
 
 export default function ReportTable(props) {
     const { rows, page, loading, category, setFilterDate, setPage, rowsPerPage, setRowsPerPage, total} = props;
@@ -110,22 +82,18 @@ export default function ReportTable(props) {
     
 
     const viewPdf = (row) => {
-        // const filePath = `${category.type}/downloaded/${row.fileLink}`
-        // const fileLink = `http://localhost:8000/api/getpdf?filePath=${encodeURIComponent(filePath)}&fileName=${encodeURIComponent(row.fileName)}`;
-        const fileLink = `http://188.245.216.211/public/download/${category.type}/${row.fileLink}`;
-        const googleViewerUrl = `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(fileLink)}`;
-        window.open(googleViewerUrl, '_blank'); // Opens in a new tab
+        // const fileLink = `http://localhost:8000/api/pdf?pdfPath=${category.ftpPath}/${row.fileLink}`
+        const fileLink = `http://188.245.216.211:8000/api/pdf?pdfPath=${category.ftpPath}/${row.fileLink}`
+        // const googleViewerUrl = `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(fileLink)}`;
+        // const googleViewerUrl = `https://drive.google.com/viewerng/viewer?embedded=true&url=${encodeURIComponent(fileLink)}`;
+
+        // window.open(googleViewerUrl, '_blank');
+        window.open(fileLink, '_blank');
     };
 
     useEffect(() => {
         localStorage.setItem("pageNumber", page); // Store page number
     }, [page]);
-
-    // const handleRequestSort = (event, property) => {
-    //     const isAsc = orderBy === property && order === 'asc';
-    //     setOrder(isAsc ? 'desc' : 'asc');
-    //     setOrderBy(property);
-    // };
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
@@ -153,15 +121,20 @@ export default function ReportTable(props) {
                 <Typography variant="h5" id="tableTitle" component="div">
                     {category.title}
                 </Typography>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DemoContainer components={['DatePicker']}>
-                        <DatePicker 
-                            onChange={(newValue) => setFilterDate(newValue)}
-                            label="Date Filter" 
-                            slotProps={{field: {clearable: true}}}
-                        />
-                    </DemoContainer>
-                </LocalizationProvider>
+                <div style={{display: "flex", alignItems: "center"}}>
+                    <Typography variant="h6" id="tableTitle" component="div" sx={{mr: 2}}>
+                        {`${total} Documents`}
+                    </Typography>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DemoContainer components={['DatePicker']}>
+                            <DatePicker 
+                                onChange={(newValue) => setFilterDate(newValue)}
+                                label="Date Filter" 
+                                slotProps={{field: {clearable: true}}}
+                            />
+                        </DemoContainer>
+                    </LocalizationProvider>
+                </div>
             </Toolbar>
             <TableContainer>
                 <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size="medium">
@@ -181,7 +154,7 @@ export default function ReportTable(props) {
                                         <TableCell align="right">{row.status ? "Yes" : "No"}</TableCell>
                                         <TableCell align="right">{row.fileName}</TableCell>
                                         <TableCell align="right">
-                                            <Tooltip title={`${category.ftpPath}/${row.fileLink}`}>
+                                            <Tooltip title={`DB-Legale-doc${category.ftpPath}/${row.fileLink}`}>
                                                 <Button variant="outlined" onClick={() => viewPdf(row)}  disabled={!row.status}>
                                                     View PDF
                                                 </Button>

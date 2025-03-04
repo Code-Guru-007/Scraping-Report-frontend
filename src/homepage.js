@@ -8,16 +8,23 @@ import ReportTable from './reporttable';
 export default function HomePage() {
     const menuItems = useMemo(
         () => [
-        { label: 'Normativa Nazionale', subMenu: [] },
-        { label: 'Sentenze Cassazione', subMenu: [] },
-        {
-            label: 'Sentenze Tributarie',
+        { label: 'Assistente Normativa', subMenu: [] 
+        },
+        { label: 'Assistente Cassazione', 
             subMenu: [
-            { label: 'Normativa Tributaria', subType: 'Normativa' },
-            { label: 'Prassi Tributaria', subType: 'Prassi' },
-            { label: 'Giurisprudenza Tributaria', subType: 'Giurisprudenza' },
+                { label: "Assistente Sentenze Cassazione Civile", subType: "snciv"},
+                { label: "Assistente Sentenze Cassazione Penale", subType: "snpen"},
+            ] 
+        },
+        {
+            label: 'Assistente Tributano',
+            subMenu: [
+                { label: 'Normativa Tributaria', subType: 'Normativa' },
+                { label: 'Prassi Tributaria', subType: 'Prassi' },
+                { label: 'Giurisprudenza Tributaria', subType: 'Giurisprudenza' },
             ],
         },
+        { label: 'Assistente Sentenze Di Merito', subMenu: [] },
         ],
         []
     );
@@ -27,17 +34,22 @@ export default function HomePage() {
         {
             title: 'www.normattiva.it/ricerca/elencoPerData',
             type: 'normative',
-            ftpPath: 'DB-Legale-doc/normative/downloaded',
+            ftpPath: '/normative/downloaded',
         },
         {
             title: 'www.italgiure.giustizia.it/sncass/',
             type: 'sentenze_cassazione',
-            ftpPath: 'DB-Legale-doc/sentenze_cassazione/downloaded',
+            ftpPath: '/sentenze_cassazione/downloaded',
         },
         {
             title: 'def.finanze.it/DocTribFrontend/RS2_HomePage.jsp',
             type: 'def.finanze.it',
-            ftpPath: 'DB-Legale-doc/fisco/downloaded/def.finanze.it',
+            ftpPath: '/fisco/downloaded/def.finanze.it',
+        },
+        {
+            title: 'www.ilmerito.it/bancadati/index.php?pag_id=43&tipo=4',
+            type: 'ilmerito.it',
+            ftpPath: '/sentenze_merito/downloaded',
         },
         ],
         []
@@ -112,62 +124,62 @@ export default function HomePage() {
             </Typography>
         </Container>
         <Grid container spacing={2} sx={{ p: 2 }}>
-            <Grid item xs={2}>
-            <Paper sx={{ px: 2, py: 4 }}>
-                <MenuList>
-                {menuItems.map((item, index) => (
-                    <React.Fragment key={index}>
-                    <MenuItem
-                        selected={
-                        item.subMenu.length > 0
-                            ? !subType && selectedMenu === index
-                            : selectedMenu === index
-                        }
-                        onClick={() =>
-                        item.subMenu.length === 0
-                            ? !loading && handleMenuSelect(index)
-                            : setOpenSubmenu((prev) => !prev)
-                        }
-                        disabled={loading}
-                    >   
-                        <div style={{display: "flex", justifyContent: "space-between", width: "100%"}}>
-                            {item.label}
-                            {item.subMenu.length > 0 && (openSubmenu ? <ExpandLess /> : <ExpandMore />)}
-                        </div>
-                    </MenuItem>
-                    {item.subMenu.length > 0 && (
-                        <Collapse in={openSubmenu} timeout="auto" unmountOnExit>
-                        <MenuList component="div" disablePadding>
-                            {item.subMenu.map((subItem, subIndex) => (
-                            <MenuItem
-                                key={subIndex}
-                                sx={{ pl: 4 }}
-                                selected={selectedMenu === index && subType === subItem.subType}
-                                onClick={() => handleMenuSelect(index, subItem.subType)}
-                            >
-                                {subItem.label}
-                            </MenuItem>
-                            ))}
-                        </MenuList>
-                        </Collapse>
-                    )}
-                    </React.Fragment>
-                ))}
-                </MenuList>
-            </Paper>
+            <Grid item xs={3}>
+                <Paper sx={{ px: 2, py: 4 }}>
+                    <MenuList>
+                    {menuItems.map((item, index) => (
+                        <React.Fragment key={index}>
+                        <MenuItem
+                            selected={
+                            item.subMenu.length > 0
+                                ? !subType && selectedMenu === index
+                                : selectedMenu === index
+                            }
+                            onClick={() =>
+                            item.subMenu.length === 0
+                                ? !loading && handleMenuSelect(index)
+                                : setOpenSubmenu((prev) => !prev)
+                            }
+                            disabled={loading}
+                        >   
+                            <div style={{display: "flex", justifyContent: "space-between", width: "100%"}}>
+                                {item.label}
+                                {item.subMenu.length > 0 && (openSubmenu ? <ExpandLess /> : <ExpandMore />)}
+                            </div>
+                        </MenuItem>
+                        {item.subMenu.length > 0 && (
+                            <Collapse in={openSubmenu} timeout="auto" unmountOnExit>
+                            <MenuList component="div" disablePadding>
+                                {item.subMenu.map((subItem, subIndex) => (
+                                <MenuItem
+                                    key={subIndex}
+                                    sx={{ pl: 4 }}
+                                    selected={selectedMenu === index && subType === subItem.subType}
+                                    onClick={() => handleMenuSelect(index, subItem.subType)}
+                                >
+                                    {subItem.label}
+                                </MenuItem>
+                                ))}
+                            </MenuList>
+                            </Collapse>
+                        )}
+                        </React.Fragment>
+                    ))}
+                    </MenuList>
+                </Paper>
             </Grid>
-            <Grid item xs={10}>
-            <ReportTable
-                total={total}
-                loading={loading}
-                rows={rows}
-                page={page}
-                category={category}
-                rowsPerPage={rowsPerPage}
-                setRowsPerPage={setRowsPerPage}
-                setPage={setPage}
-                setFilterDate={setFilterDate}
-            />
+            <Grid item xs={9}>
+                <ReportTable
+                    total={total}
+                    loading={loading}
+                    rows={rows}
+                    page={page}
+                    category={category}
+                    rowsPerPage={rowsPerPage}
+                    setRowsPerPage={setRowsPerPage}
+                    setPage={setPage}
+                    setFilterDate={setFilterDate}
+                />
             </Grid>
         </Grid>
         </>
