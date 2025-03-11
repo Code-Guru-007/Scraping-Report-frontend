@@ -18,6 +18,12 @@ import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 
 const headCells = [
@@ -128,7 +134,15 @@ export default function ReportTable(props) {
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DemoContainer components={['DatePicker']}>
                             <DatePicker 
-                                onChange={(newValue) => setFilterDate(newValue)}
+                                onChange={(newValue) => {
+                                    if (newValue) {
+                                        const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone; // Auto-detect local timezone
+                                        const localDate = dayjs(newValue).tz(userTimezone).format('YYYY-MM-DD');
+                                        setFilterDate(localDate);
+                                    } else {
+                                        setFilterDate(null);
+                                    }
+                                }}
                                 label="Date Filter" 
                                 slotProps={{field: {clearable: true}}}
                             />
@@ -148,7 +162,7 @@ export default function ReportTable(props) {
                                 </TableRow>
                                 ):(
                                 rows.map((row, index) => (
-                                    <TableRow hover role="checkbox" tabIndex={-1} key={index} sx={{ cursor: 'pointer' }}>
+                                    <TableRow hover role="checkbox" key={index} sx={{ cursor: 'pointer' }}>
                                         <TableCell align="right">{total - page * rowsPerPage - index}</TableCell>
                                         <TableCell align="right">{new Date(row.dateTime).toLocaleString()}</TableCell>
                                         <TableCell align="right">{row.status ? "Yes" : "No"}</TableCell>

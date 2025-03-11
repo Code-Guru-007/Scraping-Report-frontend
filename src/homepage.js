@@ -6,50 +6,76 @@ import axios from 'axios';
 import ReportTable from './reporttable';
 
 export default function HomePage() {
+
+    ////////////////    Start Const Variable //////////////////////
     const menuItems = useMemo(
         () => [
-        { label: 'Assistente Normativa', subMenu: [] 
+        { 
+            label: 'Assistente Normativa', 
+            title: 'www.normattiva.it/ricerca/elencoPerData',
+            type: 'normative',
+            ftpPath: '/normative/downloaded',
+            subMenu: [] 
         },
-        { label: 'Assistente Cassazione', 
+        { 
+            label: 'Assistente Cassazione', 
+            type: 'sentenze_cassazione',
             subMenu: [
-                { label: "Assistente Sentenze Cassazione Civile", subType: "snciv"},
-                { label: "Assistente Sentenze Cassazione Penale", subType: "snpen"},
+                { 
+                    title: 'www.italgiure.giustizia.it/sncass/',
+                    label: "Civile", 
+                    subType: "snciv",
+                    ftpPath: '/sentenze_cassazione_civile/downloaded',
+                },
+                { 
+                    title: 'www.italgiure.giustizia.it/sncass/',
+                    label: "Penale", 
+                    subType: "snpen",
+                    ftpPath: '/sentenze_cassazione_penale/downloaded',
+                },
             ] 
         },
         {
             label: 'Assistente Tributano',
+            type: 'def.finanze.it',
             subMenu: [
-                { label: 'Normativa Tributaria', subType: 'Normativa' },
-                { label: 'Prassi Tributaria', subType: 'Prassi' },
-                { label: 'Giurisprudenza Tributaria', subType: 'Giurisprudenza' },
+                { 
+                    title: 'def.finanze.it/DocTribFrontend/RS2_HomePage.jsp',
+                    ftpPath: '/fisco/downloaded/def.finanze.it',
+                    label: 'Normativa Tributaria', 
+                    subType: 'Normativa' 
+                },
+                { 
+                    title: 'def.finanze.it/DocTribFrontend/RS2_HomePage.jsp',
+                    ftpPath: '/fisco/downloaded/def.finanze.it',
+                    label: 'Prassi Tributaria', 
+                    subType: 'Prassi' 
+                },
+                { 
+                    title: 'def.finanze.it/DocTribFrontend/RS2_HomePage.jsp',
+                    ftpPath: '/fisco/downloaded/def.finanze.it',
+                    label: 'Giurisprudenza Tributaria', 
+                    subType: 'Giurisprudenza' 
+                },
             ],
         },
-        { label: 'Assistente Sentenze Di Merito', subMenu: [] },
-        ],
-        []
-    );
-
-    const categoryList = useMemo(
-        () => [
-        {
-            title: 'www.normattiva.it/ricerca/elencoPerData',
-            type: 'normative',
-            ftpPath: '/normative/downloaded',
-        },
-        {
-            title: 'www.italgiure.giustizia.it/sncass/',
-            type: 'sentenze_cassazione',
-            ftpPath: '/sentenze_cassazione/downloaded',
-        },
-        {
-            title: 'def.finanze.it/DocTribFrontend/RS2_HomePage.jsp',
-            type: 'def.finanze.it',
-            ftpPath: '/fisco/downloaded/def.finanze.it',
-        },
-        {
-            title: 'www.ilmerito.it/bancadati/index.php?pag_id=43&tipo=4',
-            type: 'ilmerito.it',
-            ftpPath: '/sentenze_merito/downloaded',
+        { 
+            label: 'Assistente Sentenze Di Merito',
+            type: 'merito',
+            subMenu: [
+                { 
+                    title: 'www.ilmerito.it/bancadati/index.php?pag_id=43&tipo=4',
+                    ftpPath: '/sentenze_merito/downloaded',
+                    label: 'Il Merito', 
+                    subType: 'ilmerito' 
+                },
+                { 
+                    title: 'apps.dirittopratico.it/sentenze.html',
+                    ftpPath: '/sentenze_merito/downloaded/',
+                    label: 'Dirittopratico', 
+                    subType: 'dirittopratico' 
+                },
+            ]
         },
         ],
         []
@@ -58,63 +84,104 @@ export default function HomePage() {
     const [selectedMenu, setSelectedMenu] = useState(
         () => parseInt(localStorage.getItem('selectedMenu')) || 0
     );
-    const [subType, setSubType] = useState('');
+    const [subType, setSubType] = useState(() => (localStorage.getItem('subType') || ''));
     const [filterDate, setFilterDate] = useState(null);
     const [rows, setRows] = useState([]);
     const [page, setPage] = useState(() => parseInt(localStorage.getItem('pageNumber')) || 0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [total, setTotal] = useState(0);
     const [loading, setLoading] = useState(false);
-    const [openSubmenu, setOpenSubmenu] = useState(false);
+    const [openSubmenus, setOpenSubmenus] = useState(() => (JSON.parse(localStorage.getItem('openSubmenus')) || {}));
+    const [dailyData, setDailyData] = useState({});
+    const [reportDate, setReportDate] = useState(new Date().toUTCString().split("T")[0]);
+    const [category, setCategory] = useState({
+        type: localStorage.getItem('menuItemType') || 'normative'
+    })
 
-    const category = useMemo(() => {
-        const lastCategory = localStorage.getItem('categoryType') || 'normattiva';
-        if (categoryList[selectedMenu].type !== lastCategory) {
-        setPage(0);
-        localStorage.setItem('pageNumber', 0);
-        }
-        localStorage.setItem('categoryType', categoryList[selectedMenu].type);
-        return categoryList[selectedMenu];
-    }, [selectedMenu, categoryList]);
+    ////////////////    End Const Variable //////////////////////
+    
+
+
+    ///////////     Start   useEffect        ////////////
 
     useEffect(() => {
+        fetchDailyData();
         localStorage.setItem('selectedMenu', selectedMenu);
     }, [selectedMenu]);
 
     useEffect(() => {
-        const fetchData = async () => {
-        setLoading(true);
-        try {
-            const res = await axios.get(
-                `http://188.245.216.211:8000/api/${category.type}?filterDate=${filterDate}&page=${page}&rowsPerPage=${rowsPerPage}&subType=${subType}`
-            );
-            // const res = await axios.get(
-            //     `http://localhost:8000/api/${category.type}?filterDate=${filterDate}&page=${page}&rowsPerPage=${rowsPerPage}&subType=${subType}`
-            // );
-            if (res.data.status === 'success') {
-                setRows(res.data.reports);
-                setTotal(res.data.total);
-            } else {
+        const fetchPDFData = async () => {
+            setLoading(true);
+            try {
+                const res = await axios.get(
+                    `http://188.245.216.211:8000/api/${category.type}?filterDate=${filterDate}&page=${page}&rowsPerPage=${rowsPerPage}&subType=${subType}`
+                );
+                if (res.data.status === 'success') {
+                    setRows(res.data.reports);
+                    setTotal(res.data.total);
+                } else {
+                    setRows([]);
+                    setTotal(0);
+                }
+            } catch (error) {
+                console.error('Error fetching data:', error);
                 setRows([]);
                 setTotal(0);
             }
-        } catch (error) {
-            console.error('Error fetching data:', error);
-            setRows([]);
-            setTotal(0);
-        }
-        setLoading(false);
+            setLoading(false);
         };
-        fetchData();
+        fetchDailyData();
+        fetchPDFData();
     }, [filterDate, category, page, rowsPerPage, subType]);
 
-    const handleMenuSelect = useCallback((menuIndex, subTypeValue = '') => {
+    ///////////     End   useEffect        ////////////
+    
+    ///////////     Start   function       ////////////
+
+    const handleMenuSelect = useCallback((menuIndex, ftpPath, title, subTypeValue = '') => {
+        const lastCategory = localStorage.getItem('menuItemType') || 'normative';
+        if (menuItems[menuIndex].type !== lastCategory) {
+            setPage(0);
+            localStorage.setItem('pageNumber', 0);
+        }
+        localStorage.setItem('menuItemType', menuItems[menuIndex].type);
+        setCategory({
+            type: menuItems[menuIndex].type,
+            ftpPath: ftpPath,
+            title: title
+        })
         setSelectedMenu(menuIndex);
+        setSubType(subTypeValue);
         localStorage.setItem('selectedMenu', menuIndex);
         localStorage.setItem('pageNumber', 0);
+        localStorage.setItem('subType', subTypeValue);
         setPage(0);
-        setSubType(subTypeValue);
-    }, []);
+    }, [menuItems]);
+
+    const toggleSubmenu = (menuIndex) => {
+        setOpenSubmenus((prev) => {
+            const newState = { ...prev, [menuIndex]: !prev[menuIndex] };
+            localStorage.setItem('openSubmenus', JSON.stringify(newState)); // Save to storage
+            return newState;
+        });
+    };
+
+    const fetchDailyData = async () => {
+        const currentDate = new Date().toISOString().split("T")[0]; // Get current date (YYYY-MM-DD)
+        try {
+            setReportDate(currentDate)
+            const res = await axios.get(`http://188.245.216.211:8000/api/report?reportDate=${currentDate}`);
+            if (res.data.status === "success") {
+                setDailyData(res.data.report); 
+            }
+        } catch (error) {
+            console.error("Error fetching daily data:", error);
+        }
+    };
+    
+
+    ///////////     End   useEffect        ////////////
+    
 
     return (
         <>
@@ -127,44 +194,50 @@ export default function HomePage() {
             <Grid item xs={3}>
                 <Paper sx={{ px: 2, py: 4 }}>
                     <MenuList>
-                    {menuItems.map((item, index) => (
-                        <React.Fragment key={index}>
-                        <MenuItem
-                            selected={
-                            item.subMenu.length > 0
-                                ? !subType && selectedMenu === index
-                                : selectedMenu === index
-                            }
-                            onClick={() =>
-                            item.subMenu.length === 0
-                                ? !loading && handleMenuSelect(index)
-                                : setOpenSubmenu((prev) => !prev)
-                            }
-                            disabled={loading}
-                        >   
-                            <div style={{display: "flex", justifyContent: "space-between", width: "100%"}}>
-                                {item.label}
-                                {item.subMenu.length > 0 && (openSubmenu ? <ExpandLess /> : <ExpandMore />)}
-                            </div>
-                        </MenuItem>
-                        {item.subMenu.length > 0 && (
-                            <Collapse in={openSubmenu} timeout="auto" unmountOnExit>
-                            <MenuList component="div" disablePadding>
-                                {item.subMenu.map((subItem, subIndex) => (
+                        <MenuItem disabled sx={{opacity: "1!important", display: "flex", flexDirection: "row-reverse", pr: "46px"}}> {reportDate}</MenuItem>
+                        {menuItems.map((item, index) => (
+                            <React.Fragment key={index}>
                                 <MenuItem
-                                    key={subIndex}
-                                    sx={{ pl: 4 }}
-                                    selected={selectedMenu === index && subType === subItem.subType}
-                                    onClick={() => handleMenuSelect(index, subItem.subType)}
-                                >
-                                    {subItem.label}
+                                    selected={
+                                        item.subMenu.length > 0
+                                            ? !subType && selectedMenu === index
+                                            : selectedMenu === index
+                                    }
+                                    onClick={() =>
+                                        item.subMenu.length === 0
+                                            ? !loading && handleMenuSelect(index, item.ftpPath, item.title)
+                                            : toggleSubmenu(index) // Only toggle expand/collapse for submenus
+                                    }
+                                    disabled={loading}
+                                >   
+                                    <div style={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
+                                        {item.label}
+                                        {item.subMenu.length === 0 && (<p style={{margin: "0 30px 0 0"}}>{dailyData[menuItems[index].type]}</p>)}
+                                        {item.subMenu.length > 0 && (openSubmenus[index] ? <ExpandLess /> : <ExpandMore />)}
+                                    </div>
                                 </MenuItem>
-                                ))}
-                            </MenuList>
-                            </Collapse>
-                        )}
-                        </React.Fragment>
-                    ))}
+                                {item.subMenu.length > 0 && (
+                                    <Collapse in={openSubmenus[index]} timeout="auto" unmountOnExit>
+                                        <MenuList component="div" disablePadding>
+                                            {item.subMenu.map((subItem, subIndex) => (
+                                                <MenuItem
+                                                    key={subIndex}
+                                                    sx={{ pl: 4 }}
+                                                    selected={selectedMenu === index && subType === subItem.subType}
+                                                    onClick={() => handleMenuSelect(index, subItem.ftpPath, subItem.title, subItem.subType)}
+                                                    disabled={loading}
+                                                >
+                                                    <div style={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
+                                                        {subItem.label}
+                                                        <p style={{margin: "0 30px 0 0"}}>{dailyData[subItem.subType]}</p>
+                                                    </div>
+                                                </MenuItem>
+                                            ))}
+                                        </MenuList>
+                                    </Collapse>
+                                )}
+                            </React.Fragment>
+                        ))}
                     </MenuList>
                 </Paper>
             </Grid>
