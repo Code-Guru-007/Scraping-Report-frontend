@@ -82,8 +82,9 @@ function EnhancedTableHead(props) {
 
 
 export default function ReportTable(props) {
-    const { rows, page, loading, category, setFilterDate, setPage, rowsPerPage, setRowsPerPage, total} = props;
+    const { rows, page, loading, category, setFilterDate, setPage, rowsPerPage, setRowsPerPage, total, setDocDate, showDocDate} = props;
 
+    console.log(category)
     // Load page number from localStorage
     
 
@@ -116,6 +117,9 @@ export default function ReportTable(props) {
 
     return (
         <Paper sx={{ p: 4 }}>
+            <Typography variant="h5" id="tableTitle" component="div">
+                {category.title}
+            </Typography>
             <Toolbar
                 sx={{
                     pl: { sm: 2 },
@@ -124,31 +128,47 @@ export default function ReportTable(props) {
                     justifyContent: 'space-between'
                 }}
             >
-                <Typography variant="h5" id="tableTitle" component="div">
-                    {category.title}
-                </Typography>
-                <div style={{display: "flex", alignItems: "center"}}>
+                {/* <div style={{display: "flex", alignItems: "center", justifyContent: "space-between"}}> */}
                     <Typography variant="h6" id="tableTitle" component="div" sx={{mr: 2}}>
                         {`${total} Documents`}
                     </Typography>
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DemoContainer components={['DatePicker']}>
-                            <DatePicker 
-                                onChange={(newValue) => {
-                                    if (newValue) {
-                                        const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone; // Auto-detect local timezone
-                                        const localDate = dayjs(newValue).tz(userTimezone).format('YYYY-MM-DD');
-                                        setFilterDate(localDate);
-                                    } else {
-                                        setFilterDate(null);
-                                    }
-                                }}
-                                label="Date Filter" 
-                                slotProps={{field: {clearable: true}}}
-                            />
-                        </DemoContainer>
-                    </LocalizationProvider>
-                </div>
+                    <div style={{display: "flex", gap: "15px"}}>
+                        {showDocDate && <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <DemoContainer components={['DatePicker']}>
+                                <DatePicker 
+                                    onChange={(newValue) => {
+                                        if (newValue) {
+                                            const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone; // Auto-detect local timezone
+                                            const localDate = dayjs(newValue).tz(userTimezone).format('YYYY-MM-DD');
+                                            setDocDate(localDate);
+                                        } else {
+                                            setDocDate(null);
+                                        }
+                                    }}
+                                    label="Doc Date" 
+                                    slotProps={{field: {clearable: true}}}
+                                />
+                            </DemoContainer>
+                        </LocalizationProvider>}
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <DemoContainer components={['DatePicker']}>
+                                <DatePicker 
+                                    onChange={(newValue) => {
+                                        if (newValue) {
+                                            const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone; // Auto-detect local timezone
+                                            const localDate = dayjs(newValue).tz(userTimezone).format('YYYY-MM-DD');
+                                            setFilterDate(localDate);
+                                        } else {
+                                            setFilterDate(null);
+                                        }
+                                    }}
+                                    label="Scrape Date" 
+                                    slotProps={{field: {clearable: true}}}
+                                />
+                            </DemoContainer>
+                        </LocalizationProvider>
+                    </div>
+                {/* </div> */}
             </Toolbar>
             <TableContainer>
                 <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size="medium">

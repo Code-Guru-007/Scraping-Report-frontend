@@ -86,6 +86,7 @@ export default function HomePage() {
     );
     const [subType, setSubType] = useState(() => (localStorage.getItem('subType') || ''));
     const [filterDate, setFilterDate] = useState(null);
+    const [docDate, setDocDate] = useState(null);
     const [rows, setRows] = useState([]);
     const [page, setPage] = useState(() => parseInt(localStorage.getItem('pageNumber')) || 0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -94,8 +95,31 @@ export default function HomePage() {
     const [openSubmenus, setOpenSubmenus] = useState(() => (JSON.parse(localStorage.getItem('openSubmenus')) || {}));
     const [dailyData, setDailyData] = useState({});
     const [reportDate, setReportDate] = useState(new Date().toUTCString().split("T")[0]);
-    const [category, setCategory] = useState({
-        type: localStorage.getItem('menuItemType') || 'normative'
+    
+    const [category, setCategory] = useState(() => {
+        const storedType = localStorage.getItem('menuItemType') || 'normative';
+        let foundCategory = null;
+    
+        for (const item of menuItems) {
+            if (item.type === storedType && item.subMenu.length === 0) {
+                foundCategory = { type: item.type, title: item.title, ftpPath: item.ftpPath };
+                break;
+            }
+            for (const subItem of item.subMenu || []) {
+                if (subItem.subType === localStorage.getItem('subType')) {
+                    foundCategory = { type: item.type, title: subItem.title, ftpPath: subItem.ftpPath };
+                    break;
+                }
+            }
+            if (foundCategory) break;
+        }
+    
+        return foundCategory || { type: storedType };
+    });
+
+    const [showDocDate, setShowDocDate] = useState(() => {
+        if(category.type == "normative" || localStorage.getItem('subType') == "ilmerito") return false;
+        else return true;
     })
 
     ////////////////    End Const Variable //////////////////////
@@ -114,7 +138,7 @@ export default function HomePage() {
             setLoading(true);
             try {
                 const res = await axios.get(
-                    `http://188.245.216.211:8000/api/${category.type}?filterDate=${filterDate}&page=${page}&rowsPerPage=${rowsPerPage}&subType=${subType}`
+                    `http://188.245.216.211:8000/api/${category.type}?filterDate=${filterDate}&page=${page}&rowsPerPage=${rowsPerPage}&subType=${subType}&docDate=${docDate}`
                 );
                 if (res.data.status === 'success') {
                     setRows(res.data.reports);
@@ -132,13 +156,19 @@ export default function HomePage() {
         };
         fetchDailyData();
         fetchPDFData();
-    }, [filterDate, category, page, rowsPerPage, subType]);
+    }, [filterDate, category, page, rowsPerPage, subType, docDate]);
 
     ///////////     End   useEffect        ////////////
     
     ///////////     Start   function       ////////////
 
     const handleMenuSelect = useCallback((menuIndex, ftpPath, title, subTypeValue = '') => {
+        const currentType = menuItems[menuIndex].type;
+    
+        // Determine showDocDate logic
+        const newShowDocDate = !(currentType === 'normative' || subTypeValue === 'ilmerito');
+        setShowDocDate(newShowDocDate);
+
         const lastCategory = localStorage.getItem('menuItemType') || 'normative';
         if (menuItems[menuIndex].type !== lastCategory) {
             setPage(0);
@@ -249,9 +279,11 @@ export default function HomePage() {
                     page={page}
                     category={category}
                     rowsPerPage={rowsPerPage}
+                    showDocDate={showDocDate}
                     setRowsPerPage={setRowsPerPage}
                     setPage={setPage}
                     setFilterDate={setFilterDate}
+                    setDocDate={setDocDate}
                 />
             </Grid>
         </Grid>
